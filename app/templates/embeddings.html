@@ -26,6 +26,8 @@
             padding: 10px;
             border-radius: 3px;
             margin-top: 10px;
+            max-height: 100px;
+            overflow: scroll;
         }
         .metadata { color: #666; font-size: 0.9em; margin-top: 10px; }
         .pagination { margin-top: 20px; text-align: center; }
@@ -63,8 +65,8 @@
             <h3>{{ doc.title }}</h3>
             <div class="metadata">
                 <strong>ID:</strong> {{ doc.id }}
-                {% if doc.get_metadata() %}
-                <div><strong>Metadata:</strong> {{ doc.get_metadata() }}</div>
+                {% if doc.document_metadata %}
+                <div><strong>Metadata:</strong> {{ doc.document_metadata }}</div>
                 {% endif %}
             </div>
             <div class="embedding-vector">

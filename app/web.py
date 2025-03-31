@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 import json
 
-from app.db import get_db, get_all_documents
+from app.db import get_db, get_all_documents, Document
 from app.embedding import query_similar
 
 app = FastAPI(title="Embedding Test App")
@@ -73,8 +73,8 @@ HTML_TEMPLATE = """
                 <p>{{ doc.content }}</p>
                 <div class="metadata">
                     <strong>ID:</strong> {{ doc.id }}
-                    {% if doc.metadata %}
-                    <div><strong>Metadata:</strong> {{ doc.metadata }}</div>
+                    {% if doc.document_metadata %}
+                    <div><strong>Metadata:</strong> {{ doc.document_metadata }}</div>
                     {% endif %}
                 </div>
             </div>
@@ -160,8 +160,8 @@ EMBEDDINGS_TEMPLATE = """
             <h3>{{ doc.title }}</h3>
             <div class="metadata">
                 <strong>ID:</strong> {{ doc.id }}
-                {% if doc.get_metadata() %}
-                <div><strong>Metadata:</strong> {{ doc.get_metadata() }}</div>
+                {% if doc.document_metadata %}
+                <div><strong>Metadata:</strong> {{ doc.document_metadata }}</div>
                 {% endif %}
             </div>
             <div class="embedding-vector">
@@ -247,15 +247,16 @@ def search_documents(query: str, limit: int = 5):
 @app.get("/embeddings", response_class=HTMLResponse)
 async def view_embeddings(request: Request, page: int = 1, db: Session = Depends(get_db)):
     per_page = 10
-    documents = get_all_documents(db)
-    total_pages = (len(documents) + per_page - 1) // per_page
-    start_idx = (page - 1) * per_page
-    end_idx = start_idx + per_page
-    paginated_documents = documents[start_idx:end_idx]
+    # Get total count first
+    total_count = db.query(Document).count()
+    total_pages = (total_count + per_page - 1) // per_page
+    
+    # Get paginated documents directly from database
+    documents = db.query(Document).offset((page - 1) * per_page).limit(per_page).all()
     
     return templates.TemplateResponse("embeddings.html", {
         "request": request,
-        "documents": paginated_documents,
+        "documents": documents,
         "page": page,
         "total_pages": total_pages
     })
