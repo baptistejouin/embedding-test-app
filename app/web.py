@@ -54,6 +54,18 @@ HTML_TEMPLATE = """
         
         <h2>{% if search_results %}Search Results{% else %}All Documents (total: {{ total_count }}){% endif %}</h2>
         
+        {% if not search_results %}
+        <div class="pagination" style="margin: 20px 0; text-align: center;">
+            {% if page > 1 %}
+            <a href="/?page={{ page - 1 }}" style="margin: 0 5px; padding: 5px 10px; border: 1px solid #ddd; text-decoration: none; color: #4CAF50;">Previous</a>
+            {% endif %}
+            <span style="margin: 0 10px;">Page {{ page }} of {{ total_pages }}</span>
+            {% if page < total_pages %}
+            <a href="/?page={{ page + 1 }}" style="margin: 0 5px; padding: 5px 10px; border: 1px solid #ddd; text-decoration: none; color: #4CAF50;">Next</a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
         {% if search_results %}
             {% for doc in search_results %}
             <div class="document">
@@ -185,14 +197,20 @@ with open("app/templates/embeddings.html", "w") as f:
 
 
 @app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request, db: Session = Depends(get_db)):
+async def read_root(request: Request, page: int = 1, db: Session = Depends(get_db)):
+    per_page = 10
     total_count = get_all_documents(db, count_only=True)
-    documents = get_all_documents(db)
+    total_pages = (total_count + per_page - 1) // per_page
+    start_idx = (page - 1) * per_page
+    end_idx = start_idx + per_page
+    documents = get_all_documents(db, skip=start_idx, limit=per_page)
     return templates.TemplateResponse("index.html", {
         "request": request,
         "documents": documents,
         "search_results": None,
-        "total_count": total_count
+        "total_count": total_count,
+        "page": page,
+        "total_pages": total_pages
     })
 
 
