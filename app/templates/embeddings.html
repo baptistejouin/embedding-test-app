@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Embedding Vectors - Embedding Test App</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        h1 { color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .nav-links { margin: 20px 0; }
+        .nav-links a { margin-right: 15px; color: #4CAF50; text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+        .embedding-card { 
+            margin: 15px 0; 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .embedding-vector {
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 0.9em;
+            background: #fff;
+            padding: 10px;
+            border-radius: 3px;
+            margin-top: 10px;
+        }
+        .metadata { color: #666; font-size: 0.9em; margin-top: 10px; }
+        .pagination { margin-top: 20px; text-align: center; }
+        .pagination a { 
+            margin: 0 5px; 
+            padding: 5px 10px; 
+            border: 1px solid #ddd; 
+            text-decoration: none; 
+            color: #4CAF50;
+        }
+        .pagination a:hover { background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Embedding Vectors</h1>
+        
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/embeddings">View Embeddings</a>
+        </div>
+
+        <div class="pagination">
+            {% if page > 1 %}
+            <a href="/embeddings?page={{ page - 1 }}">Previous</a>
+            {% endif %}
+            <span>Page {{ page }} of {{ total_pages }}</span>
+            {% if page < total_pages %}
+            <a href="/embeddings?page={{ page + 1 }}">Next</a>
+            {% endif %}
+        </div>
+
+        {% for doc in documents %}
+        <div class="embedding-card">
+            <h3>{{ doc.title }}</h3>
+            <div class="metadata">
+                <strong>ID:</strong> {{ doc.id }}
+                {% if doc.get_metadata() %}
+                <div><strong>Metadata:</strong> {{ doc.get_metadata() }}</div>
+                {% endif %}
+            </div>
+            <div class="embedding-vector">
+                {{ doc.get_embedding_str() }}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="pagination">
+            {% if page > 1 %}
+            <a href="/embeddings?page={{ page - 1 }}">Previous</a>
+            {% endif %}
+            <span>Page {{ page }} of {{ total_pages }}</span>
+            {% if page < total_pages %}
+            <a href="/embeddings?page={{ page + 1 }}">Next</a>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

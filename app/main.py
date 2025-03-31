@@ -44,9 +44,10 @@ def embed(file_path):
 @cli.command("serve")
 @click.option("--host", default="0.0.0.0", help="Host to bind the server")
 @click.option("--port", default=8080, help="Port to bind the server")
-def serve(host, port):
+@click.option("--reload", is_flag=True, default=True, help="Enable auto-reload")
+def serve(host, port, reload):
     """Start the web server."""
-    uvicorn.run(app, host=host, port=port)
+    uvicorn.run(app, host=host, port=port, reload=reload)
 
 
 if __name__ == "__main__":

@@ -52,7 +52,7 @@ HTML_TEMPLATE = """
             </form>
         </div>
         
-        <h2>{% if search_results %}Search Results{% else %}All Documents (total: {{ documents|length }}){% endif %}</h2>
+        <h2>{% if search_results %}Search Results{% else %}All Documents (total: {{ total_count }}){% endif %}</h2>
         
         {% if search_results %}
             {% for doc in search_results %}
@@ -186,11 +186,13 @@ with open("app/templates/embeddings.html", "w") as f:
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request, db: Session = Depends(get_db)):
+    total_count = get_all_documents(db, count_only=True)
     documents = get_all_documents(db)
     return templates.TemplateResponse("index.html", {
         "request": request,
         "documents": documents,
-        "search_results": None
+        "search_results": None,
+        "total_count": total_count
     })
 
 

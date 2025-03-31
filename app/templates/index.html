@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Embedding Test App</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        h1 { color: #333; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .search-box { margin: 20px 0; padding: 10px; }
+        .search-box input { padding: 8px; width: 70%; }
+        .search-box button { padding: 8px 15px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        .document { margin: 10px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .document h3 { margin-top: 0; }
+        .metadata { color: #666; font-size: 0.9em; }
+        .nav-links { margin: 20px 0; }
+        .nav-links a { margin-right: 15px; color: #4CAF50; text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Embedding Test App</h1>
+        
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/embeddings">View Embeddings</a>
+        </div>
+        
+        <div class="search-box">
+            <form action="/search" method="post">
+                <input type="text" name="query" placeholder="Enter your search query...">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+        
+        <h2>{% if search_results %}Search Results{% else %}All Documents (total: {{ total_count }}){% endif %}</h2>
+        
+        {% if search_results %}
+            {% for doc in search_results %}
+            <div class="document">
+                <h3>{{ doc.title }}</h3>
+                <p>{{ doc.content }}</p>
+                <div class="metadata">
+                    <strong>ID:</strong> {{ doc.id }}
+                    {% if doc.metadata %}
+                    <div><strong>Metadata:</strong> {{ doc.metadata }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            {% for doc in documents %}
+            <div class="document">
+                <h3>{{ doc.title }}</h3>
+                <p>{{ doc.content[:200] }}...</p>
+                <div class="metadata">
+                    <strong>ID:</strong> {{ doc.id }}
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</body>
+</html>

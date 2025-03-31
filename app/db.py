@@ -78,7 +78,7 @@ def insert_document(db, doc_id, title, content, metadata, embedding):
     return doc
 
 
-def search_similar(db, query_embedding, limit=5):
+def search_similar(db, query_embedding, limit=10):
     """Search for documents similar to the query embedding."""
     # Convert embedding to numpy array if it's not already
     if not isinstance(query_embedding, np.ndarray):
@@ -90,8 +90,20 @@ def search_similar(db, query_embedding, limit=5):
     return result.scalars().all()
 
 
-def get_all_documents(db, skip=0, limit=100):
-    """Get all documents from the database."""
+def get_all_documents(db, skip=0, limit=100, count_only=False):
+    """Get all documents from the database.
+    
+    Args:
+        db: Database session
+        skip: Number of records to skip (for pagination)
+        limit: Maximum number of records to return
+        count_only: If True, returns only the total count of documents
+    """
+    if count_only:
+        stmt = select(Document)
+        result = db.execute(stmt)
+        return len(result.scalars().all())
+    
     stmt = select(Document).offset(skip).limit(limit)
     result = db.execute(stmt)
     return result.scalars().all()

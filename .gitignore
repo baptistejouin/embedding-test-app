@@ -3,3 +3,4 @@
 
 # Ignore all files in the data directory
 data/*
+app/__pycache__
