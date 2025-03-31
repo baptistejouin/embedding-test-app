@@ -46,13 +46,13 @@ HTML_TEMPLATE = """
         </div>
         
         <div class="search-box">
-            <form action="/search" method="post">
-                <input type="text" name="query" placeholder="Enter your search query...">
+            <form action="/search" method="get">
+                <input type="text" name="query" placeholder="Enter your search query..." value="{{ query if query else '' }}">
                 <button type="submit">Search</button>
             </form>
         </div>
         
-        <h2>{% if search_results %}Search Results{% else %}All Documents (total: {{ total_count }}){% endif %}</h2>
+        <h2>{% if search_results %}Search Results for "{{ query }}"{% else %}All Documents (total: {{ total_count }}){% endif %}</h2>
         
         {% if not search_results %}
         <div class="pagination" style="margin: 20px 0; text-align: center;">
@@ -214,13 +214,21 @@ async def read_root(request: Request, page: int = 1, db: Session = Depends(get_d
     })
 
 
-@app.post("/search", response_class=HTMLResponse)
-async def search(request: Request, query: str = Form(...)):
+@app.get("/search", response_class=HTMLResponse)
+async def search_get(request: Request, query: str = "", db: Session = Depends(get_db)):
+    if not query:
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "search_results": None,
+            "documents": [],
+            "query": ""
+        })
     results = query_similar(query)
     return templates.TemplateResponse("index.html", {
         "request": request,
         "search_results": results,
-        "documents": []
+        "documents": [],
+        "query": query
     })
 
 

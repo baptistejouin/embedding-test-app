@@ -28,13 +28,13 @@
         </div>
         
         <div class="search-box">
-            <form action="/search" method="post">
-                <input type="text" name="query" placeholder="Enter your search query...">
+            <form action="/search" method="get">
+                <input type="text" name="query" placeholder="Enter your search query..." value="{{ query if query else '' }}">
                 <button type="submit">Search</button>
             </form>
         </div>
         
-        <h2>{% if search_results %}Search Results{% else %}All Documents (total: {{ total_count }}){% endif %}</h2>
+        <h2>{% if search_results %}Search Results for "{{ query }}"{% else %}All Documents (total: {{ total_count }}){% endif %}</h2>
         
         {% if not search_results %}
         <div class="pagination" style="margin: 20px 0; text-align: center;">
